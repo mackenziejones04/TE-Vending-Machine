@@ -16,7 +16,6 @@ namespace Capstone.Classes
                 Console.WriteLine("This is the UserInterface");
                 Console.ReadLine();
             }
-
         }
     }
 }
