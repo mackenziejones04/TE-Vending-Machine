@@ -8,20 +8,14 @@ namespace CapstoneTests
     public class VendingMachineTests
     {
         VendingMachine vm;
+        List<VendingMachineSlot> slots;
 
         [TestInitialize]
         public void Initialize()
         {
             vm = new VendingMachine();
 
-        }
-
-        [TestMethod]
-        public void Initialize_CreatesAllVendingMachineSlots()
-        {
-            vm = new VendingMachine();
-
-            List<VendingMachineSlot> slots = new List<VendingMachineSlot>
+            slots = new List<VendingMachineSlot>
             {
                 new VendingMachineSlot("A1"),
                 new VendingMachineSlot("A2"),
@@ -40,6 +34,20 @@ namespace CapstoneTests
                 new VendingMachineSlot("D3"),
                 new VendingMachineSlot("D4")
             };
+
+            VendingMachineItem vmi = new VendingMachineItem("name", 1.00M);
+            foreach (VendingMachineSlot vms in slots)
+            {
+                vms.PlaceItemInSlot(vmi);
+
+            }
+            vm.Slots = slots;
+        }
+
+        [TestMethod]
+        public void Initialize_CreatesAllVendingMachineSlots()
+        {
+            vm = new VendingMachine();
 
             CollectionAssert.AreEqual(slots, vm.Slots);
         }
@@ -115,8 +123,12 @@ namespace CapstoneTests
 
         [TestMethod]
         public void DispenseItem_ARow_CrunchCrunchYum()
-        {
-            vm = new VendingMachine();
+        {        
+            //Must have enough money to allow dispense function
+            vm.AddMoneyToTheVendingMachine(10);
+            vm.AddMoneyToTheVendingMachine(10);
+            vm.AddMoneyToTheVendingMachine(10);
+
             vm.SelectSlot("A1");
             Assert.AreEqual("Crunch Crunch, Yum!", vm.DispenseItem());
             vm.SelectSlot("A2");
@@ -129,7 +141,11 @@ namespace CapstoneTests
         [TestMethod]
         public void DispenseItem_BRow_MunchMunchYum()
         {
-            vm = new VendingMachine();
+            //Must have enough money to allow dispense function
+            vm.AddMoneyToTheVendingMachine(10);
+            vm.AddMoneyToTheVendingMachine(10);
+            vm.AddMoneyToTheVendingMachine(10);
+
             vm.SelectSlot("B1");
             Assert.AreEqual("Munch Munch, Yum!", vm.DispenseItem());
             vm.SelectSlot("B2");
@@ -142,7 +158,11 @@ namespace CapstoneTests
         [TestMethod]
         public void DispenseItem_CRow_GlugGlugYum()
         {
-            vm = new VendingMachine();
+            //Must have enough money to allow dispense function
+            vm.AddMoneyToTheVendingMachine(10);
+            vm.AddMoneyToTheVendingMachine(10);
+            vm.AddMoneyToTheVendingMachine(10);
+
             vm.SelectSlot("C1");
             Assert.AreEqual("Glug Glug, Yum!", vm.DispenseItem());
             vm.SelectSlot("C2");
@@ -155,7 +175,11 @@ namespace CapstoneTests
         [TestMethod]
         public void DispenseItem_DRow_ChewChewYum()
         {
-            vm = new VendingMachine();
+            //Must have enough money to allow dispense function
+            vm.AddMoneyToTheVendingMachine(10);
+            vm.AddMoneyToTheVendingMachine(10);
+            vm.AddMoneyToTheVendingMachine(10);
+
             vm.SelectSlot("D1");
             Assert.AreEqual("Chew Chew, Yum!", vm.DispenseItem());
             vm.SelectSlot("D2");

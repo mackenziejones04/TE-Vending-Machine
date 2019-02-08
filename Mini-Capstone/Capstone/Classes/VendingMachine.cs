@@ -6,8 +6,6 @@ namespace Capstone.Classes
 {
     public class VendingMachine
     {
-        // TODO: put this somewhere => private string filePath = @"C:\VendingMachine";
-
         public List<VendingMachineSlot> Slots { get; set; }
         public VendingMachineSlot SelectedSlot { get; private set; }
         public decimal MoneyInTheVendingMachine { get; private set; }
@@ -41,11 +39,11 @@ namespace Capstone.Classes
             };
         }
 
-        public void AddMoneyToTheVendingMachine(int bill)
+        public void AddMoneyToTheVendingMachine(int amount)
         {
-            if (bill > 0.0M)
+            if (amount > 0.0M)
             {
-                MoneyInTheVendingMachine += (decimal)bill;
+                MoneyInTheVendingMachine += (decimal)amount;
             }
         }
 
@@ -73,24 +71,41 @@ namespace Capstone.Classes
         {
             string result = "";
 
-            if (SelectedSlot.NameOfSlot != "")
+            if (SelectedSlot.ItemInSlot != null)
             {
-                switch (SelectedSlot.NameOfSlot[0])
+                if (MoneyInTheVendingMachine >= SelectedSlot.ItemInSlot.Price)
                 {
-                    case 'A':
-                        result = "Crunch Crunch, Yum!";
-                        break;
-                    case 'B':
-                        result = "Munch Munch, Yum!";
-                        break;
-                    case 'C':
-                        result = "Glug Glug, Yum!";
-                        break;
-                    case 'D':
-                        result = "Chew Chew, Yum!";
-                        break;
-                    default:
-                        break;
+                    //Check the slot row for the result string;
+                    if (SelectedSlot.NameOfSlot != "")
+                    {
+                        switch (SelectedSlot.NameOfSlot[0])
+                        {
+                            case 'A':
+                                result = "Crunch Crunch, Yum!";
+                                break;
+                            case 'B':
+                                result = "Munch Munch, Yum!";
+                                break;
+                            case 'C':
+                                result = "Glug Glug, Yum!";
+                                break;
+                            case 'D':
+                                result = "Chew Chew, Yum!";
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                    //Decrement money in the vending machine by item price
+                    MoneyInTheVendingMachine -= SelectedSlot.ItemInSlot.Price;       
+                    
+                    //Take an item from the slot
+                    SelectedSlot.TakeItemFromSlot();
+                }
+                else
+                {
+                    result = "Not enough money to make the purchase!";
                 }
             }
             return result;
