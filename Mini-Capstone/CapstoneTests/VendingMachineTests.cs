@@ -45,14 +45,6 @@ namespace CapstoneTests
         }
 
         [TestMethod]
-        public void Initialize_CreatesAllVendingMachineSlots()
-        {
-            vm = new VendingMachine();
-
-            CollectionAssert.AreEqual(slots, vm.Slots);
-        }
-
-        [TestMethod]
         public void AddMoneyToVendingMachine_SomeBills_UpdatedMoney()
         {
             vm = new VendingMachine();
@@ -102,7 +94,6 @@ namespace CapstoneTests
         [TestMethod]
         public void SelectSlot_ValidChoice_True()
         {
-            vm = new VendingMachine();
             Assert.AreEqual(true, vm.SelectSlot("A2"));
             Assert.AreEqual(true, vm.SelectSlot("B2"));
             Assert.AreEqual(true, vm.SelectSlot("D4"));
@@ -188,17 +179,6 @@ namespace CapstoneTests
             Assert.AreEqual("Chew Chew, Yum!", vm.DispenseItem());
             vm.SelectSlot("D4");
             Assert.AreEqual("Chew Chew, Yum!", vm.DispenseItem());
-        }
-        [TestMethod]
-        public void DispenseItem_InvalidRow_EmptyString()
-        {
-            vm = new VendingMachine();
-            vm.SelectSlot("F1");
-            Assert.AreEqual("", vm.DispenseItem());
-            vm.SelectSlot("D6");
-            Assert.AreEqual("", vm.DispenseItem());
-            vm.SelectSlot("D1B");
-            Assert.AreEqual("", vm.DispenseItem());
         }
     }
 }

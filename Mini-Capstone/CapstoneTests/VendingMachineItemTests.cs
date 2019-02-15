@@ -23,11 +23,5 @@ namespace CapstoneTests
             vmi.Price = 0.0M;
             Assert.AreEqual(0.0M, vmi.Price);
         }
-        [TestMethod]
-        public void VendingMachineItemPriceSet_NegativeValue_Zero()
-        {
-            vmi.Price = -5.0M;
-            Assert.AreEqual(0.0M, vmi.Price);
-        }
     }
 }

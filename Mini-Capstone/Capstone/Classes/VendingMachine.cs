@@ -18,25 +18,7 @@ namespace Capstone.Classes
         private void Initialize()
         {
             SelectedSlot = new VendingMachineSlot();
-            Slots = new List<VendingMachineSlot>
-            {
-                new VendingMachineSlot("A1"),
-                new VendingMachineSlot("A2"),
-                new VendingMachineSlot("A3"),
-                new VendingMachineSlot("A4"),
-                new VendingMachineSlot("B1"),
-                new VendingMachineSlot("B2"),
-                new VendingMachineSlot("B3"),
-                new VendingMachineSlot("B4"),
-                new VendingMachineSlot("C1"),
-                new VendingMachineSlot("C2"),
-                new VendingMachineSlot("C3"),
-                new VendingMachineSlot("C4"),
-                new VendingMachineSlot("D1"),
-                new VendingMachineSlot("D2"),
-                new VendingMachineSlot("D3"),
-                new VendingMachineSlot("D4")
-            };
+            Slots = new List<VendingMachineSlot>();
         }
 
         public void AddMoneyToTheVendingMachine(int amount)
@@ -71,44 +53,67 @@ namespace Capstone.Classes
         {
             string result = "";
 
-            if (SelectedSlot.ItemInSlot != null)
+            //Check the slot row for the result string;
+            if (SelectedSlot.NameOfSlot != "")
             {
-                if (MoneyInTheVendingMachine >= SelectedSlot.ItemInSlot.Price)
+                switch (SelectedSlot.NameOfSlot[0])
                 {
-                    //Check the slot row for the result string;
-                    if (SelectedSlot.NameOfSlot != "")
-                    {
-                        switch (SelectedSlot.NameOfSlot[0])
-                        {
-                            case 'A':
-                                result = "Crunch Crunch, Yum!";
-                                break;
-                            case 'B':
-                                result = "Munch Munch, Yum!";
-                                break;
-                            case 'C':
-                                result = "Glug Glug, Yum!";
-                                break;
-                            case 'D':
-                                result = "Chew Chew, Yum!";
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-
-                    //Decrement money in the vending machine by item price
-                    MoneyInTheVendingMachine -= SelectedSlot.ItemInSlot.Price;       
-                    
-                    //Take an item from the slot
-                    SelectedSlot.TakeItemFromSlot();
-                }
-                else
-                {
-                    result = "Not enough money to make the purchase!";
+                    case 'A':
+                        result = "Crunch Crunch, Yum!";
+                        break;
+                    case 'B':
+                        result = "Munch Munch, Yum!";
+                        break;
+                    case 'C':
+                        result = "Glug Glug, Yum!";
+                        break;
+                    case 'D':
+                        result = "Chew Chew, Yum!";
+                        break;
+                    default:
+                        break;
                 }
             }
+
+            //Decrement money in the vending machine by item price
+            MoneyInTheVendingMachine -= SelectedSlot.ItemInSlot.Price;
+
+            //Take an item from the slot
+            SelectedSlot.TakeItemFromSlot();
+
             return result;
+        }
+
+        public string GetReturnChangeString(decimal returnChange)
+        {
+            int quarters = 0;
+            int dimes = 0;
+            int nickels = 0;
+
+            while (returnChange != 0.00M)
+            {
+                if (returnChange >= 0.25M)
+                {
+                    quarters++;
+                    returnChange -= 0.25M;
+                }
+                else if (returnChange >= 0.10M)
+                {
+                    dimes++;
+                    returnChange -= 0.10M;
+                }
+                else if (returnChange >= 0.05M)
+                {
+                    nickels++;
+                    returnChange -= 0.05M;
+                }
+            }
+            return $"Returning {quarters} quarters, {dimes} dimes, and {nickels} nickels";
+        }
+
+        public bool MoneyAvailableForSelectedProduct()
+        {
+            return (MoneyInTheVendingMachine >= SelectedSlot.ItemInSlot.Price);
         }
 
         private void ResetBalanceToZero()

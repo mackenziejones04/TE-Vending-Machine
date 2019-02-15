@@ -7,28 +7,14 @@ namespace Capstone.Classes
 {
     public class UserInterface
     {
-        //Initialize vending machine
         private VendingMachine vendingMachine = new VendingMachine();
 
         public void RunInterface()
         {
             bool done = false;
-
-            try
-            {
-                vendingMachine.Slots = VendingMachineFileController.ReadIn(vendingMachine.Slots);
-            }
-            catch (IOException e)
+            if (!InitializeVendingMachine())
             {
                 done = true;
-                Console.WriteLine("FATAL ERROR : File access error, quitting program!");
-                Console.WriteLine(e.Message);
-            }
-            catch (VendingMachineFileControllerException e)
-            {
-                done = true;
-                Console.WriteLine("FATAL ERROR: Problems parsing the read in file!");
-                Console.WriteLine(e.Message);
             }
 
             while (!done)
@@ -65,7 +51,22 @@ namespace Capstone.Classes
             Console.ReadLine();
         }
 
-        public void DisplayVendingMachineItems()
+        private bool InitializeVendingMachine()
+        {
+            try
+            {
+                vendingMachine.Slots = VendingMachineFileController.ReadIn();
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("FATAL ERROR: Problems parsing the read in file!");
+                Console.WriteLine(e.Message);
+                return false;
+            }
+        }
+
+        private void DisplayVendingMachineItems()
         {
             foreach (VendingMachineSlot vms in vendingMachine.Slots)
             {
@@ -80,7 +81,7 @@ namespace Capstone.Classes
             Console.WriteLine();
         }
 
-        public void Purchase()
+        private void Purchase()
         {
             bool done = false;
 
@@ -89,12 +90,6 @@ namespace Capstone.Classes
                 Console.WriteLine("(1) Feed Money\n(2) Select Product\n(3) Finish Transaction");
                 Console.WriteLine($"Current Money Provided: {vendingMachine.MoneyInTheVendingMachine:C2}");
                 string inputEntry = Console.ReadLine();
-
-                if (!(inputEntry == "1" || inputEntry == "2" || inputEntry == "3"))
-                {
-                    Console.WriteLine("Invalid entry, try again");
-                    continue;
-                }
 
                 switch (inputEntry)
                 {
@@ -109,12 +104,13 @@ namespace Capstone.Classes
                         done = true;
                         break;
                     default:
+                        Console.WriteLine("Invalid entry, try again");
                         continue;
                 }
             }
         }
 
-        public void FeedMoney()
+        private void FeedMoney()
         {
             Console.Write("Enter a bill: ");
             string billEntered = Console.ReadLine();
@@ -131,22 +127,13 @@ namespace Capstone.Classes
                 else
                 {
                     vendingMachine.AddMoneyToTheVendingMachine(bill);
-                    try
-                    {
-                        VendingMachineFileController.UpdateLogFile(
-                            "FEED MONEY:",
-                            bill * 1.00M,
-                            vendingMachine.MoneyInTheVendingMachine);
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("ERROR updating Log file : " + e.Message);
-                    }
+
+                    UpdateLogFile("FEED MONEY:", bill * 1.00M, vendingMachine.MoneyInTheVendingMachine);
                 }
             }
         }
 
-        public void SelectProduct()
+        private void SelectProduct()
         {
             DisplayVendingMachineItems();
             Console.WriteLine("Enter your slot name (A2 for example):");
@@ -163,62 +150,29 @@ namespace Capstone.Classes
             else
             {
                 decimal balanceBefore = vendingMachine.MoneyInTheVendingMachine;
-                Console.WriteLine(vendingMachine.DispenseItem() + "\n");
-                try
+                
+                if (vendingMachine.MoneyAvailableForSelectedProduct())
                 {
-                    VendingMachineFileController.UpdateLogFile(
-                           vendingMachine.SelectedSlot.ItemInSlot.Name,
-                           balanceBefore,
-                           vendingMachine.MoneyInTheVendingMachine);
+                    Console.WriteLine(vendingMachine.DispenseItem() + "\n");
+                    UpdateLogFile(vendingMachine.SelectedSlot.ItemInSlot.Name, balanceBefore, 
+                        vendingMachine.MoneyInTheVendingMachine);
                 }
-                catch (Exception e)
+                else
                 {
-                    Console.WriteLine("ERROR updating Log file : " + e.Message);
+                    Console.WriteLine("Not enough money to purchase item");
                 }
             }
         }
 
-        public void FinishTransaction()
+        private void FinishTransaction()
         {
             decimal returnChange = vendingMachine.ReturnChangeToUser();
+            Console.WriteLine(vendingMachine.GetReturnChangeString(returnChange));
 
-            try
-            {
-                VendingMachineFileController.UpdateLogFile(
-                       "GIVE CHANGE:",
-                       returnChange,
-                       vendingMachine.MoneyInTheVendingMachine);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("ERROR updating Log file : " + e.Message);
-            }
-            int quarters = 0;
-            int dimes = 0;
-            int nickels = 0;
-
-            while (returnChange != 0.00M)
-            {
-                if (returnChange >= 0.25M)
-                {
-                    quarters++;
-                    returnChange -= 0.25M;
-                }
-                else if (returnChange >= 0.10M)
-                {
-                    dimes++;
-                    returnChange -= 0.10M;
-                }
-                else if (returnChange >= 0.05M)
-                {
-                    nickels++;
-                    returnChange -= 0.05M;
-                }
-            }
-            Console.WriteLine($"Returning {quarters} quarters, {dimes} dimes, and {nickels} nickels");
+            UpdateLogFile("GIVE CHANGE:", returnChange, vendingMachine.MoneyInTheVendingMachine);
         }
 
-        public void SalesReport()
+        private void SalesReport()
         {
             try
             {
@@ -230,7 +184,19 @@ namespace Capstone.Classes
             }
         }
 
-        public void End()
+        private void UpdateLogFile(string action, decimal balance, decimal endingBalance)
+        {
+            try
+            {
+                VendingMachineFileController.UpdateLogFile(action, balance, endingBalance);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("ERROR updating Log file : " + e.Message);
+            }
+        }
+
+        private void End()
         {
             Console.WriteLine("Ending interface!");
         }
